@@ -1,0 +1,15 @@
+# Build output
+*.dll
+*.exe
+libwinpthread-1.dll
+
+# IDE / editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+Desktop.ini
