@@ -36,6 +36,7 @@ target_link_libraries(ClashMonitorPlugin PRIVATE
     wininet
     gdi32
     user32
+    comdlg32
 )
 
 # Precompiled header

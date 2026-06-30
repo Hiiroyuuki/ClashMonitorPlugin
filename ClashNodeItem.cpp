@@ -24,6 +24,10 @@ void ClashInfoItem::Init(ClashField field, ClashPlugin* plugin)
         m_name = L"Clash Latency"; m_id = L"ClashLatency"; m_label = L"Latency:"; m_sample = L"8888 ms"; break;
     case ClashField::Proxy:
         m_name = L"Clash Proxy";   m_id = L"ClashProxy";   m_label = L"Proxy:";   m_sample = L"OFF"; break;
+    case ClashField::Sub:
+        m_name = L"Clash Sub";     m_id = L"ClashSub";     m_label = L"Sub:";     m_sample = L"My Subscription"; break;
+    case ClashField::Usage:
+        m_name = L"Clash Usage";   m_id = L"ClashUsage";   m_label = L"Usage:";   m_sample = L"100%"; break;
     }
 }
 
@@ -64,6 +68,13 @@ std::wstring ClashInfoItem::CurrentValue() const
     }
     case ClashField::Proxy:
         return m_plugin->IsProxyEnabled() ? L"ON" : L"OFF";
+    case ClashField::Sub:
+    {
+        std::wstring v = m_plugin->GetCurrentSubscriptionName();
+        return v.empty() ? std::wstring(L"--") : v;
+    }
+    case ClashField::Usage:
+        return m_plugin->GetUsagePercentStr();
     }
     return L"--";
 }
@@ -96,7 +107,7 @@ int ClashInfoItem::GetItemWidthEx(void* hDC) const
     if (!hdc) return GetItemWidth();
 
     int extra = 16; // left + right padding for the background chip
-    if (m_field == ClashField::Latency) extra += 13; // status dot + gap
+    if (m_field == ClashField::Latency || m_field == ClashField::Usage) extra += 13; // status dot + gap
 
     std::wstring text = m_label + L" " + CurrentValue();
     SIZE sz = { 0, 0 };
@@ -197,6 +208,31 @@ void ClashInfoItem::DrawItem(void* hDC, int x, int y, int w, int h, bool dark_mo
         SetTextColor(hdc, c);
         DrawTextW(hdc, value.c_str(), -1, &rv, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
     }
+    else if (m_field == ClashField::Usage)
+    {
+        int pct = m_plugin ? m_plugin->GetUsagePercent() : -1;
+        COLORREF c = RGB(150, 150, 150);
+        if (pct >= 0 && pct < 70) c = RGB(76, 175, 80);
+        else if (pct >= 70 && pct < 90) c = RGB(255, 193, 7);
+        else if (pct >= 90) c = RGB(244, 67, 54);
+
+        int dot = 7;
+        int dy  = y + (h - dot) / 2;
+        HBRUSH db = CreateSolidBrush(c);
+        HPEN   dp = CreatePen(PS_SOLID, 1, c);
+        HBRUSH ob = static_cast<HBRUSH>(SelectObject(hdc, db));
+        HPEN   op = static_cast<HPEN>(SelectObject(hdc, dp));
+        Ellipse(hdc, curX, dy, curX + dot, dy + dot);
+        SelectObject(hdc, ob);
+        SelectObject(hdc, op);
+        DeleteObject(db);
+        DeleteObject(dp);
+        curX += dot + 4;
+
+        RECT rv = { curX, y, right, y + h };
+        SetTextColor(hdc, c);
+        DrawTextW(hdc, value.c_str(), -1, &rv, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS);
+    }
     else
     {
         RECT rv = { curX, y, right, y + h };
@@ -220,6 +256,8 @@ int ClashInfoItem::OnMouseEvent(MouseEventType type, int x, int y, void* hWnd, i
         case ClashField::Mode:    m_plugin->ShowModeMenu(hWnd);       break;
         case ClashField::Proxy:   m_plugin->ToggleSystemProxy();      break;
         case ClashField::Latency: m_plugin->StartLatencyRefresh();    break;
+        case ClashField::Sub:     m_plugin->ShowSubscriptionMenu(hWnd); break;
+        case ClashField::Usage:   m_plugin->RefreshUsageNow();        break;
         }
         return 1;
     }

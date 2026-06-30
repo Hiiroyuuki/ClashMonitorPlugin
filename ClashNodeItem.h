@@ -11,7 +11,9 @@ enum class ClashField
     Node,     // current node name
     Mode,     // proxy mode (rule/global/direct)
     Latency,  // current node delay
-    Proxy     // system proxy on/off
+    Proxy,    // system proxy on/off
+    Sub,      // selected subscription/provider
+    Usage     // selected subscription usage percent
 };
 
 // A single standalone TrafficMonitor display item. Four of these are exposed,

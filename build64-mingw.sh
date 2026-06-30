@@ -14,7 +14,7 @@ g++ -std=c++17 -shared -o ClashMonitorPlugin.dll \
     -fno-exceptions -fno-rtti \
     -static -static-libgcc -static-libstdc++ \
     -Wl,--gc-sections -O2 \
-    -lwinhttp -lwininet -lgdi32 -luser32 2>&1
+    -lwinhttp -lwininet -lgdi32 -luser32 -lcomdlg32 2>&1
 # NOTE: -static is required — std::mutex pulls libwinpthread-1.dll otherwise
 
 ret=$?

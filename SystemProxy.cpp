@@ -121,12 +121,12 @@ std::wstring GetCurrentProxyServer()
     return std::wstring(buf);
 }
 
-bool Toggle()
+bool Toggle(const wchar_t* proxyServer, const wchar_t* bypassList)
 {
     if (IsEnabled())
         return !Disable();
     else
-        return Enable();
+        return Enable(proxyServer, bypassList);
 }
 
 } // namespace SystemProxy

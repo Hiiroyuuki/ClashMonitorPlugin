@@ -10,7 +10,7 @@ g++ -std=c++17 -shared -o ClashMonitorPlugin.dll \
     SystemProxy.cpp pch.cpp \
     -fno-exceptions -fno-rtti \
     -static-libgcc -static-libstdc++ \
-    -lwinhttp -lwininet -lgdi32 -luser32 \
+    -lwinhttp -lwininet -lgdi32 -luser32 -lcomdlg32 \
     -Wl,--gc-sections \
     -Os 2>&1
 

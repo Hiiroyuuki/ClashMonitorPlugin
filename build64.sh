@@ -15,7 +15,7 @@ g++ -std=c++17 -shared -o ClashMonitorPlugin.dll \
     -nodefaultlibs \
     -Wl,-Bstatic -lstdc++ -lgcc -lgcc_eh -lwinpthread -Wl,-Bdynamic \
     -lmingw32 -lmoldname -lmingwex -lucrt \
-    -lwinhttp -lwininet -lgdi32 -luser32 -lkernel32 -ladvapi32 -lshell32 \
+    -lwinhttp -lwininet -lgdi32 -luser32 -lcomdlg32 -lkernel32 -ladvapi32 -lshell32 \
     2>&1
 
 ret=$?

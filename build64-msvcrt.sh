@@ -14,7 +14,7 @@ g++ -std=c++17 -shared -o ClashMonitorPlugin.dll \
     -fno-exceptions -fno-rtti \
     -static-libgcc -static-libstdc++ \
     -Wl,-Bstatic -lwinpthread -Wl,-Bdynamic \
-    -lwinhttp -lwininet -lgdi32 -luser32 \
+    -lwinhttp -lwininet -lgdi32 -luser32 -lcomdlg32 \
     -Wl,--major-os-version,6 -Wl,--minor-os-version,0 \
     -Wl,--gc-sections -O2 2>&1
 

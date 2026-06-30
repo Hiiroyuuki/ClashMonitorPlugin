@@ -46,6 +46,18 @@ public:
         std::vector<ProxyNode> nodes;
     };
 
+    struct SubscriptionInfo
+    {
+        std::wstring uid;
+        std::wstring name;
+        std::wstring type;
+        unsigned long long upload = 0;
+        unsigned long long download = 0;
+        unsigned long long total = 0;
+        unsigned long long expire = 0;
+        bool hasUsage = false;
+    };
+
     std::wstring GetCurrentNodeName() const;
     std::wstring GetCurrentMode() const;
     std::wstring GetUpSpeedStr() const;
@@ -54,12 +66,17 @@ public:
     bool IsConnected() const;
     bool IsProxyEnabled() const;
     std::wstring GetProxyGroupName() const;
+    std::wstring GetCurrentSubscriptionName() const;
+    std::wstring GetUsagePercentStr() const;
+    int GetUsagePercent() const;
 
     // Per-item click actions
     void ShowNodeMenu(void* hWnd);   // Node item: dropdown to pick a node
     void ShowModeMenu(void* hWnd);   // Mode item: dropdown to pick rule/global/direct
+    void ShowSubscriptionMenu(void* hWnd); // Sub item: dropdown to pick provider/subscription
     void ToggleSystemProxy();        // Proxy item: flip ON<->OFF directly
     void StartLatencyRefresh();      // Latency item: active delay test (background)
+    void RefreshUsageNow();          // Usage item: refresh subscription usage
     bool IsLatencyRefreshing() const { return m_latencyRefreshing.load(); }
 
     // Items report the host's dark/light state during draw so popups can match
@@ -75,6 +92,11 @@ private:
     void FetchTraffic();
     void FetchProxies();
     void FetchConfig();
+    void FetchSubscriptions();
+    std::wstring ResolveProfilesPath() const;
+    static std::wstring AutoDiscoverProfilesPath();
+    bool FetchVergeSubscriptions(std::vector<SubscriptionInfo>& subs,
+                                  std::wstring& currentUid);
     void RefreshNow();      // force an immediate full refresh
     void PublishDisplay();  // push cached data to the taskbar item + tooltip
     void DebugLog(const std::wstring& msg); // append a line to ClashMonitor.log
@@ -85,8 +107,9 @@ private:
     static std::wstring PickPrimaryGroup(const std::vector<ProxyGroup>& groups,
                                          const std::wstring& preferred);
 
-    // Members — four standalone display items (node / mode / latency / proxy)
-    ClashInfoItem m_items[4];
+    // Members — standalone display items (node / mode / latency / proxy / sub / usage)
+    static constexpr int ITEM_COUNT = 6;
+    ClashInfoItem m_items[ITEM_COUNT];
     HttpHelper m_http;
     Settings m_settings;
     ITrafficMonitor* m_pApp = nullptr;
@@ -101,6 +124,10 @@ private:
     int m_currentDelay = -1;          // ms
     bool m_connected = false;
     std::vector<ProxyGroup> m_groups; // all selectable groups
+    std::vector<SubscriptionInfo> m_subscriptions; // all configured providers/subscriptions
+    std::wstring m_currentSubscriptionName;
+    std::wstring m_usagePercentStr = L"--";
+    int m_usagePercent = -1;
     int m_proxyPort = 7890;           // clash mixed/http listen port for system proxy
 
     // Latency active-refresh state (set by background thread)

@@ -16,21 +16,35 @@ void Settings::Load(const std::wstring& configDir)
 {
     std::wstring iniPath = GetIniPath(configDir);
 
-    wchar_t buf[256];
+    wchar_t buf[1024];
 
-    GetPrivateProfileStringW(L"Connection", L"Host", L"127.0.0.1", buf, 256, iniPath.c_str());
+    GetPrivateProfileStringW(L"Connection", L"Host", DEFAULT_API_HOST, buf, 1024, iniPath.c_str());
     apiHost = buf;
 
-    apiPort = GetPrivateProfileIntW(L"Connection", L"Port", 9097, iniPath.c_str());
+    apiPort = GetPrivateProfileIntW(L"Connection", L"Port", DEFAULT_API_PORT, iniPath.c_str());
 
-    GetPrivateProfileStringW(L"Connection", L"Secret", L"admin", buf, 256, iniPath.c_str());
+    GetPrivateProfileStringW(L"Connection", L"Secret", DEFAULT_API_SECRET, buf, 1024, iniPath.c_str());
     apiSecret = buf;
 
     apiTimeoutMs = GetPrivateProfileIntW(L"Connection", L"Timeout", 3000, iniPath.c_str());
     refreshIntervalMs = GetPrivateProfileIntW(L"Connection", L"RefreshInterval", 2000, iniPath.c_str());
 
-    GetPrivateProfileStringW(L"Proxy", L"Group", L"", buf, 256, iniPath.c_str());
+    GetPrivateProfileStringW(L"Proxy", L"Group", L"", buf, 1024, iniPath.c_str());
     proxyGroup = buf;
+
+    GetPrivateProfileStringW(L"Subscription", L"Name", L"", buf, 1024, iniPath.c_str());
+    subscriptionName = buf;
+
+    autoDiscoverProfiles = GetPrivateProfileIntW(L"Subscription", L"AutoDiscoverProfiles", 1, iniPath.c_str()) != 0;
+
+    GetPrivateProfileStringW(L"Subscription", L"ProfilesPath", L"", buf, 1024, iniPath.c_str());
+    profilesPath = buf;
+
+    GetPrivateProfileStringW(L"SystemProxy", L"Host", DEFAULT_SYSTEM_PROXY_HOST, buf, 1024, iniPath.c_str());
+    systemProxyHost = buf;
+
+    GetPrivateProfileStringW(L"SystemProxy", L"Bypass", DEFAULT_SYSTEM_PROXY_BYPASS, buf, 1024, iniPath.c_str());
+    systemProxyBypass = buf;
 
     autoDetectGroup = GetPrivateProfileIntW(L"Proxy", L"AutoDetectGroup", 1, iniPath.c_str()) != 0;
     showNodeDelay = GetPrivateProfileIntW(L"Display", L"ShowNodeDelay", 1, iniPath.c_str()) != 0;
@@ -49,6 +63,13 @@ void Settings::Save(const std::wstring& configDir)
 
     WritePrivateProfileStringW(L"Proxy", L"Group", proxyGroup.c_str(), iniPath.c_str());
     WritePrivateProfileStringW(L"Proxy", L"AutoDetectGroup", autoDetectGroup ? L"1" : L"0", iniPath.c_str());
+
+    WritePrivateProfileStringW(L"Subscription", L"Name", subscriptionName.c_str(), iniPath.c_str());
+    WritePrivateProfileStringW(L"Subscription", L"AutoDiscoverProfiles", autoDiscoverProfiles ? L"1" : L"0", iniPath.c_str());
+    WritePrivateProfileStringW(L"Subscription", L"ProfilesPath", profilesPath.c_str(), iniPath.c_str());
+
+    WritePrivateProfileStringW(L"SystemProxy", L"Host", systemProxyHost.c_str(), iniPath.c_str());
+    WritePrivateProfileStringW(L"SystemProxy", L"Bypass", systemProxyBypass.c_str(), iniPath.c_str());
 
     WritePrivateProfileStringW(L"Display", L"ShowNodeDelay", showNodeDelay ? L"1" : L"0", iniPath.c_str());
     WritePrivateProfileStringW(L"Display", L"ShowUpDownSpeed", showUpDownSpeed ? L"1" : L"0", iniPath.c_str());
